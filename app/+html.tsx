@@ -42,7 +42,7 @@ const mobileStyles = `
 
   @media (prefers-color-scheme: dark) {
     html, body {
-      background-color: #0a0a0a;
+      background-color: #070F0C;
     }
   }
 
@@ -59,7 +59,7 @@ const mobileStyles = `
 
   @media (prefers-color-scheme: dark) {
     #app-container {
-      background-color: #0F1F1B;
+      background-color: #0C1E18;
     }
   }
 

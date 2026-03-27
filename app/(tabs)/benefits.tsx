@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -7,6 +7,7 @@ import { CategoryChips } from '@/components/CategoryChips';
 import { BenefitItem } from '@/components/BenefitItem';
 import { benefits } from '@/data/benefits';
 import type { InsuranceType } from '@/constants/Insurance';
+import { insuranceConfig } from '@/constants/Insurance';
 import { spacing, borderRadius } from '@/constants/Spacing';
 import { typography } from '@/constants/Typography';
 import Colors from '@/constants/Colors';
@@ -16,34 +17,53 @@ export default function BenefitsScreen() {
   const isDark = useAppStore((s) => s.isDarkMode);
   const colors = Colors[isDark ? 'dark' : 'light'];
   const usedBenefits = useAppStore((s) => s.usedBenefits);
+  const benefitsFilter = useAppStore((s) => s.benefitsFilter);
+  const setBenefitsFilter = useAppStore((s) => s.setBenefitsFilter);
+
   const [selectedCategory, setSelectedCategory] = useState<InsuranceType | null>(null);
+
+  // Pick up filter set by policy detail screen
+  useEffect(() => {
+    if (benefitsFilter) {
+      setSelectedCategory(benefitsFilter);
+      setBenefitsFilter(null);
+    }
+  }, [benefitsFilter, setBenefitsFilter]);
 
   const filteredBenefits = selectedCategory
     ? benefits.filter((b) => b.policyType === selectedCategory)
     : benefits;
 
-  const unusedCount = benefits.filter((b) => !usedBenefits.includes(b.id)).length;
+  const includedBenefits = filteredBenefits.filter((b) => b.category === 'included');
+  const redeemableBenefits = filteredBenefits.filter((b) => b.category === 'redeemable');
+  const unusedRedeemable = redeemableBenefits.filter((b) => !usedBenefits.includes(b.id));
+
+  const filterLabel = selectedCategory
+    ? insuranceConfig[selectedCategory].label
+    : null;
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Your Benefits</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Discover perks included in your plans
+          {filterLabel
+            ? `${filterLabel} insurance benefits`
+            : 'Discover perks included in your plans'}
         </Text>
       </View>
 
-      {unusedCount > 0 && (
+      {unusedRedeemable.length > 0 && (
         <View style={[styles.alertBanner, { backgroundColor: colors.accent + '15' }]}>
           <View style={styles.alertIcon}>
             <Ionicons name="gift-outline" size={22} color={colors.accent} />
           </View>
           <View style={styles.alertContent}>
             <Text style={[styles.alertTitle, { color: colors.text }]}>
-              {unusedCount} unused benefit{unusedCount > 1 ? 's' : ''}
+              {unusedRedeemable.length} perk{unusedRedeemable.length > 1 ? 's' : ''} to redeem
             </Text>
             <Text style={[styles.alertSub, { color: colors.textSecondary }]}>
-              You have benefits you haven't explored yet
+              Sign up to unlock these benefits
             </Text>
           </View>
         </View>
@@ -51,14 +71,43 @@ export default function BenefitsScreen() {
 
       <CategoryChips selected={selectedCategory} onSelect={setSelectedCategory} />
 
-      <View style={styles.list}>
-        <Text style={[styles.resultsCount, { color: colors.textMuted }]}>
-          {filteredBenefits.length} benefit{filteredBenefits.length !== 1 ? 's' : ''}
-        </Text>
-        {filteredBenefits.map((benefit) => (
-          <BenefitItem key={benefit.id} benefit={benefit} />
-        ))}
-      </View>
+      {/* Included Benefits */}
+      {includedBenefits.length > 0 && (
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="shield-checkmark-outline" size={18} color={colors.success} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Included in Your Plan</Text>
+            <View style={[styles.countBadge, { backgroundColor: colors.success + '15' }]}>
+              <Text style={[styles.countText, { color: colors.success }]}>{includedBenefits.length}</Text>
+            </View>
+          </View>
+          <Text style={[styles.sectionSub, { color: colors.textMuted }]}>
+            These are automatically active with your coverage
+          </Text>
+          {includedBenefits.map((benefit) => (
+            <BenefitItem key={benefit.id} benefit={benefit} />
+          ))}
+        </View>
+      )}
+
+      {/* Redeemable Benefits */}
+      {redeemableBenefits.length > 0 && (
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="gift-outline" size={18} color={colors.accent} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Available to Redeem</Text>
+            <View style={[styles.countBadge, { backgroundColor: colors.accent + '15' }]}>
+              <Text style={[styles.countText, { color: colors.accent }]}>{redeemableBenefits.length}</Text>
+            </View>
+          </View>
+          <Text style={[styles.sectionSub, { color: colors.textMuted }]}>
+            Sign up or claim these extra perks
+          </Text>
+          {redeemableBenefits.map((benefit) => (
+            <BenefitItem key={benefit.id} benefit={benefit} />
+          ))}
+        </View>
+      )}
 
       <View style={styles.bottomPadding} />
     </ScrollView>
@@ -102,13 +151,33 @@ const styles = StyleSheet.create({
     ...typography.caption,
     marginTop: 2,
   },
-  list: {
+  section: {
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
+    marginTop: spacing.xl,
   },
-  resultsCount: {
-    ...typography.caption,
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  sectionTitle: {
+    ...typography.h3,
+    flex: 1,
+  },
+  sectionSub: {
+    ...typography.small,
+    marginTop: spacing.xs,
     marginBottom: spacing.md,
+  },
+  countBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.full,
+    minWidth: 24,
+    alignItems: 'center',
+  },
+  countText: {
+    ...typography.captionBold,
   },
   bottomPadding: {
     height: spacing.xxl,

@@ -24,10 +24,10 @@ const AffordablyDarkTheme = {
   colors: {
     ...DarkTheme.colors,
     primary: brand.accent,
-    background: '#0F1F1B',
-    card: '#1A3C34',
-    text: '#F1F5F9',
-    border: '#2D5A4E',
+    background: '#0C1E18',
+    card: '#162F27',
+    text: '#E8F5F0',
+    border: '#234A3E',
   },
 };
 

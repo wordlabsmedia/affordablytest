@@ -10,6 +10,8 @@ interface AppState {
   toggleFavoriteCarrier: (carrierId: string) => void;
   usedBenefits: string[];
   markBenefitUsed: (benefitId: string) => void;
+  benefitsFilter: InsuranceType | null;
+  setBenefitsFilter: (filter: InsuranceType | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -34,4 +36,7 @@ export const useAppStore = create<AppState>((set) => ({
         ? state.usedBenefits
         : [...state.usedBenefits, benefitId],
     })),
+
+  benefitsFilter: null,
+  setBenefitsFilter: (filter) => set({ benefitsFilter: filter }),
 }));

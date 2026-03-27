@@ -38,15 +38,15 @@ export function BenefitItem({ benefit }: Props) {
           </Text>
         </View>
         <View style={styles.right}>
-          {isUsed ? (
-            <View style={[styles.usedBadge, { backgroundColor: colors.success + '15' }]}>
-              <Text style={[styles.usedText, { color: colors.success }]}>Used</Text>
+          {benefit.category === 'redeemable' && !isUsed ? (
+            <View style={[styles.redeemBadge, { backgroundColor: colors.accent + '20' }]}>
+              <Text style={[styles.badgeText, { color: colors.accent }]}>Redeem</Text>
             </View>
-          ) : (
-            <View style={[styles.newBadge, { backgroundColor: colors.accent + '20' }]}>
-              <Text style={[styles.newText, { color: colors.accent }]}>New</Text>
+          ) : benefit.category === 'redeemable' && isUsed ? (
+            <View style={[styles.redeemBadge, { backgroundColor: colors.success + '15' }]}>
+              <Text style={[styles.badgeText, { color: colors.success }]}>Claimed</Text>
             </View>
-          )}
+          ) : null}
           <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
         </View>
       </View>
@@ -88,21 +88,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: spacing.sm,
   },
-  usedBadge: {
+  redeemBadge: {
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.full,
   },
-  usedText: {
-    ...typography.small,
-    fontWeight: '600',
-  },
-  newBadge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.full,
-  },
-  newText: {
+  badgeText: {
     ...typography.small,
     fontWeight: '600',
   },

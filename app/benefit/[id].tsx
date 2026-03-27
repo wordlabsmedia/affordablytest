@@ -50,14 +50,20 @@ export default function BenefitDetailScreen() {
             <Ionicons name={config.icon as any} size={14} color={config.color} />
             <Text style={[styles.typeText, { color: config.color }]}>{config.label}</Text>
           </View>
-          {isUsed ? (
-            <View style={[styles.usedBadge, { backgroundColor: colors.success + '15' }]}>
+          {benefit.category === 'included' ? (
+            <View style={[styles.categoryBadge, { backgroundColor: colors.success + '15' }]}>
+              <Ionicons name="shield-checkmark" size={14} color={colors.success} />
+              <Text style={[styles.categoryText, { color: colors.success }]}>Included</Text>
+            </View>
+          ) : isUsed ? (
+            <View style={[styles.categoryBadge, { backgroundColor: colors.success + '15' }]}>
               <Ionicons name="checkmark-circle" size={14} color={colors.success} />
-              <Text style={[styles.usedText, { color: colors.success }]}>Used</Text>
+              <Text style={[styles.categoryText, { color: colors.success }]}>Claimed</Text>
             </View>
           ) : (
-            <View style={[styles.newBadge, { backgroundColor: colors.accent + '20' }]}>
-              <Text style={[styles.newText, { color: colors.accent }]}>New</Text>
+            <View style={[styles.categoryBadge, { backgroundColor: colors.accent + '20' }]}>
+              <Ionicons name="gift" size={14} color={colors.accent} />
+              <Text style={[styles.categoryText, { color: colors.accent }]}>Redeem</Text>
             </View>
           )}
         </View>
@@ -143,7 +149,7 @@ const styles = StyleSheet.create({
   typeText: {
     ...typography.captionBold,
   },
-  usedBadge: {
+  categoryBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
@@ -151,15 +157,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
   },
-  usedText: {
-    ...typography.captionBold,
-  },
-  newBadge: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.full,
-  },
-  newText: {
+  categoryText: {
     ...typography.captionBold,
   },
   policyInfo: {
