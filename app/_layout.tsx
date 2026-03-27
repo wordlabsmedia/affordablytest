@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
 import 'react-native-reanimated';
 
 import Colors, { brand } from '@/constants/Colors';
@@ -69,30 +70,41 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={isDark ? AffordablyDarkTheme : AffordablyLightTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="policy/[id]"
-          options={{
-            title: 'Policy Details',
-            presentation: 'card',
-          }}
-        />
-        <Stack.Screen
-          name="comparison/[id]"
-          options={{
-            title: 'Plan Comparison',
-            presentation: 'modal',
-          }}
-        />
-        <Stack.Screen
-          name="benefit/[id]"
-          options={{
-            title: 'Benefit Details',
-            presentation: 'modal',
-          }}
-        />
-      </Stack>
+      <View style={webStyles.container}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="policy/[id]"
+            options={{
+              title: 'Policy Details',
+              presentation: 'card',
+            }}
+          />
+          <Stack.Screen
+            name="comparison/[id]"
+            options={{
+              title: 'Plan Comparison',
+              presentation: 'modal',
+            }}
+          />
+          <Stack.Screen
+            name="benefit/[id]"
+            options={{
+              title: 'Benefit Details',
+              presentation: 'modal',
+            }}
+          />
+        </Stack>
+      </View>
     </ThemeProvider>
   );
 }
+
+const webStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    width: '100%',
+    maxWidth: Platform.OS === 'web' ? 430 : undefined,
+    alignSelf: 'center',
+  },
+});

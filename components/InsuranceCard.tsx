@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View, Dimensions } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -10,7 +10,7 @@ import { spacing, borderRadius } from '@/constants/Spacing';
 import { typography } from '@/constants/Typography';
 import { brand } from '@/constants/Colors';
 
-const CARD_WIDTH = Dimensions.get('window').width - spacing.xl * 2;
+const MAX_MOBILE_WIDTH = 430;
 
 interface Props {
   policy: Policy;
@@ -19,11 +19,14 @@ interface Props {
 export function InsuranceCard({ policy }: Props) {
   const [flipped, setFlipped] = useState(false);
   const config = insuranceConfig[policy.type];
+  const { width: windowWidth } = useWindowDimensions();
+  const containerWidth = Math.min(windowWidth, MAX_MOBILE_WIDTH);
+  const cardWidth = containerWidth - spacing.xl * 2;
 
   if (flipped) {
     return (
       <TouchableOpacity
-        style={[styles.card]}
+        style={[styles.card, { width: cardWidth }]}
         onPress={() => setFlipped(false)}
         activeOpacity={0.95}
       >
@@ -52,7 +55,7 @@ export function InsuranceCard({ policy }: Props) {
 
   return (
     <TouchableOpacity
-      style={[styles.card]}
+      style={[styles.card, { width: cardWidth }]}
       onPress={() => setFlipped(true)}
       activeOpacity={0.95}
     >
@@ -113,7 +116,6 @@ export function InsuranceCard({ policy }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    width: CARD_WIDTH,
     borderRadius: borderRadius.lg,
     overflow: 'hidden',
     elevation: 4,

@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { StyleSheet, ScrollView, View, Dimensions, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { StyleSheet, ScrollView, View, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Text } from '@/components/Themed';
@@ -10,11 +10,14 @@ import { typography } from '@/constants/Typography';
 import Colors, { brand } from '@/constants/Colors';
 import { useAppStore } from '@/store/useAppStore';
 
-const CARD_WIDTH = Dimensions.get('window').width - spacing.xl * 2;
+const MAX_MOBILE_WIDTH = 430;
 
 export default function WalletScreen() {
   const isDark = useAppStore((s) => s.isDarkMode);
   const colors = Colors[isDark ? 'dark' : 'light'];
+  const { width: windowWidth } = useWindowDimensions();
+  const containerWidth = Math.min(windowWidth, MAX_MOBILE_WIDTH);
+  const cardWidth = containerWidth - spacing.xl * 2;
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -30,7 +33,7 @@ export default function WalletScreen() {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.cardScroller}
-        snapToInterval={CARD_WIDTH + spacing.md}
+        snapToInterval={cardWidth + spacing.md}
         decelerationRate="fast"
       >
         {policies.map((policy) => (
