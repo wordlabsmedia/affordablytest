@@ -18,7 +18,6 @@ export default function PolicyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const isDark = useAppStore((s) => s.isDarkMode);
   const colors = Colors[isDark ? 'dark' : 'light'];
-  const setBenefitsFilter = useAppStore((s) => s.setBenefitsFilter);
   const router = useRouter();
 
   const policy = policies.find((p) => p.id === id);
@@ -41,8 +40,7 @@ export default function PolicyDetailScreen() {
   const redeemableBenefits = policyBenefits.filter((b) => b.category === 'redeemable');
 
   const handleViewAllBenefits = () => {
-    setBenefitsFilter(policy.type);
-    router.push('/(tabs)/benefits');
+    router.push(`/(tabs)/benefits?filter=${policy.type}`);
   };
 
   return (

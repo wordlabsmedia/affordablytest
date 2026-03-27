@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { Text } from '@/components/Themed';
 import { CategoryChips } from '@/components/CategoryChips';
 import { BenefitItem } from '@/components/BenefitItem';
 import { benefits } from '@/data/benefits';
-import type { InsuranceType } from '@/constants/Insurance';
-import { insuranceConfig } from '@/constants/Insurance';
+import { InsuranceType, insuranceConfig, insuranceTypes } from '@/constants/Insurance';
 import { spacing, borderRadius } from '@/constants/Spacing';
 import { typography } from '@/constants/Typography';
 import Colors from '@/constants/Colors';
@@ -17,18 +17,19 @@ export default function BenefitsScreen() {
   const isDark = useAppStore((s) => s.isDarkMode);
   const colors = Colors[isDark ? 'dark' : 'light'];
   const usedBenefits = useAppStore((s) => s.usedBenefits);
-  const benefitsFilter = useAppStore((s) => s.benefitsFilter);
-  const setBenefitsFilter = useAppStore((s) => s.setBenefitsFilter);
+  const router = useRouter();
+  const params = useLocalSearchParams<{ filter?: string }>();
 
   const [selectedCategory, setSelectedCategory] = useState<InsuranceType | null>(null);
 
-  // Pick up filter set by policy detail screen
+  // Pick up filter from URL params (e.g., navigating from policy detail)
   useEffect(() => {
-    if (benefitsFilter) {
-      setSelectedCategory(benefitsFilter);
-      setBenefitsFilter(null);
+    if (params.filter && insuranceTypes.includes(params.filter as InsuranceType)) {
+      setSelectedCategory(params.filter as InsuranceType);
+      // Clear the param so it doesn't persist on tab switches
+      router.setParams({ filter: undefined } as any);
     }
-  }, [benefitsFilter, setBenefitsFilter]);
+  }, [params.filter]);
 
   const filteredBenefits = selectedCategory
     ? benefits.filter((b) => b.policyType === selectedCategory)
